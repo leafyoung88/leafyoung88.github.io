@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <meta name="keywords" content="Hexo Theme Keep">
+    <meta name="description" content="Hexo Theme Keep">
+    <meta name="author" content="Lifu Yang">
+    
+    <title>
+        
+            GitHub Actions + Hexo 配置 |
+        
+        Lifu&#39;s blog
+    </title>
+    
+<link rel="stylesheet" href="/css/style.css">
+
+    <link rel="shortcut icon" href="/images/avatar.png">
+    
+<link rel="stylesheet" href="/css/font-awesome.min.css">
+
+    <script id="hexo-configurations">
+    let KEEP = window.KEEP || {};
+    KEEP.hexo_config = {"hostname":"leafyoung88.github.io","root":"/","language":"zh-CN"};
+    KEEP.theme_config = {"toc":{"enable":true,"number":false,"expand_all":true,"init_open":false},"style":{"primary_color":"#0066CC","avatar":"/images/avatar.png","favicon":"/images/avatar.png","article_img_align":"left","left_side_width":"260px","content_max_width":"920px","hover":{"shadow":false,"scale":false},"first_screen":{"enable":false,"background_img":"/images/bg.svg","description":"Keep writing and Keep loving."},"scroll":{"progress_bar":{"enable":false},"percent":{"enable":false}}},"local_search":{"enable":false,"preload":false},"code_copy":{"enable":true,"style":"default"},"pjax":{"enable":false},"lazyload":{"enable":false},"version":"3.4.3"};
+    KEEP.language_ago = {"second":"%s 秒前","minute":"%s 分钟前","hour":"%s 小时前","day":"%s 天前","week":"%s 周前","month":"%s 月前","year":"%s 年前"};
+  </script>
+<meta name="generator" content="Hexo 5.4.0"></head>
+
+
+<body>
+<div class="progress-bar-container">
+    
+
+    
+</div>
+
+
+<main class="page-container">
+
+    
+
+    <div class="page-main-content">
+
+        <div class="page-main-content-top">
+            <header class="header-wrapper">
+
+    <div class="header-content">
+        <div class="left">
+            
+            <a class="logo-title" href="/">
+                Lifu&#39;s blog
+            </a>
+        </div>
+
+        <div class="right">
+            <div class="pc">
+                <ul class="menu-list">
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/"
+                            >
+                                首页
+                            </a>
+                        </li>
+                    
+                        <li class="menu-item">
+                            <a class=""
+                               href="/archives"
+                            >
+                                归档
+                            </a>
+                        </li>
+                    
+                    
+                </ul>
+            </div>
+            <div class="mobile">
+                
+                <div class="icon-item menu-bar">
+                    <div class="menu-bar-middle"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="header-drawer">
+        <ul class="drawer-menu-list">
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/">首页</a>
+                </li>
+            
+                <li class="drawer-menu-item flex-center">
+                    <a class=""
+                       href="/archives">归档</a>
+                </li>
+            
+        </ul>
+    </div>
+
+    <div class="window-mask"></div>
+
+</header>
+
+
+        </div>
+
+        <div class="page-main-content-middle">
+
+            <div class="main-content">
+
+                
+                    <div class="fade-in-down-animation">
+    <div class="article-content-container">
+
+        <div class="article-title">
+            <span class="title-hover-animation">GitHub Actions + Hexo 配置</span>
+        </div>
+
+        
+            <div class="article-header">
+                <div class="avatar">
+                    <img src="/images/avatar.png">
+                </div>
+                <div class="info">
+                    <div class="author">
+                        <span class="name">Lifu Yang</span>
+                        
+                            <span class="author-label">Lv1</span>
+                        
+                    </div>
+                    <div class="meta-info">
+                        <div class="article-meta-info">
+    <span class="article-date article-meta-item">
+        <i class="fas fa-edit"></i>&nbsp;2021-08-18 08:48:15
+    </span>
+    
+    
+
+    
+    
+    
+    
+        <span class="article-pv article-meta-item">
+            <i class="fas fa-eye"></i>&nbsp;<span id="busuanzi_value_page_pv"></span>
+        </span>
+    
+</div>
+
+                    </div>
+                </div>
+            </div>
+        
+
+        <div class="article-content markdown-body">
+            <h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>本文详细描述如何利用GitHub Actions进行Hexo静态站点自动部署，从而避免了在本地端每次更改之后都要重新生成静态HTML文件并提到个人GitHub Pages仓库的重复性工作，大大提高了Hexo的易用性。</p>
+<p>必要软件：</p>
+<ul>
+<li><a target="_blank" rel="noopener" href="https://nodejs.org/"><em>Node.js</em></a></li>
+<li>Hexo</li>
+<li>Git</li>
+</ul>
+<p>并且：</p>
+<ul>
+<li>了解GitHub Pages， Git Actions等基本概念</li>
+<li>了解Hexo的基本使用，可以使用Hexo在本地建立站点并运行</li>
+</ul>
+<h2 id="GitHub端设置"><a href="#GitHub端设置" class="headerlink" title="GitHub端设置"></a>GitHub端设置</h2><h3 id="Step1：生成ssh密钥"><a href="#Step1：生成ssh密钥" class="headerlink" title="Step1：生成ssh密钥"></a>Step1：生成ssh密钥</h3><p>运行命令行ssh-keygen，生成ssh密钥对，名称随意，这里为hexo-deploy-key，应生成hexo-deploy-key和hexo-deploy-key.pub两个文件，且前者为私钥，后者为公钥。</p>
+<h3 id="Step2：在GitHub添加公钥"><a href="#Step2：在GitHub添加公钥" class="headerlink" title="Step2：在GitHub添加公钥"></a>Step2：在GitHub添加公钥</h3><p>登录GitHub后在个人账户的“Setttings”中点击进入“SSH and GPG Keys”页面，点击“New SSH Key”,输入任意名称，然后将hexo-deploy-key.pub文件中内容填入“Key”文本框并保存。<br><img src="github_add_ssh_key.png" alt="add ssh key"></p>
+<h3 id="Step3：创建GitHub-Pages仓库"><a href="#Step3：创建GitHub-Pages仓库" class="headerlink" title="Step3：创建GitHub Pages仓库"></a>Step3：创建GitHub Pages仓库</h3><p>新建一个“公开”仓库，名称为&lt;username&gt;.github.io，这里是leafyoung88.github.io，该库为GitHub Pages的默认站点，无需进行其它配置。<br><img src="github_create_githubpages_repo.png" alt="create github pages repo"></p>
+<h3 id="Step4：创建站点源码仓库"><a href="#Step4：创建站点源码仓库" class="headerlink" title="Step4：创建站点源码仓库"></a>Step4：创建站点源码仓库</h3><p>新建一个私有仓库，用于存放Hexo生成的网站源代码，名称随意，这里为blog<br><img src="github_create_blog_repo.png" alt="create blog repo"><br>进入blog仓库的“Settings”-&gt;“Secrets”，点击“New repository secret”按钮：<br><img src="github_add_secret.png" alt="add secret"><br>新建一个名为“HEXO_DEPLOY_KEY”的secret，粘贴hexo-deploy-key文件中的内容<br><img src="github_add_hexo_deploy_key.png" alt="add hexo deploy private key"></p>
+<h2 id="本地设置"><a href="#本地设置" class="headerlink" title="本地设置"></a>本地设置</h2><h3 id="Step1：创建本地站点"><a href="#Step1：创建本地站点" class="headerlink" title="Step1：创建本地站点"></a>Step1：创建本地站点</h3><p>运行hexo init blog创建站点源码，此时生成目录blog，进入该目录。（在进行以下操作前，建议在本地测试hexo工作正常）</p>
+<h3 id="Step2：修改部署目标"><a href="#Step2：修改部署目标" class="headerlink" title="Step2：修改部署目标"></a>Step2：修改部署目标</h3><p>修改_config.yml，将末尾的deploy段修改如下</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">deploy:</span></span><br><span class="line">  <span class="attr">type:</span> <span class="string">git</span></span><br><span class="line">  <span class="attr">repository:</span> <span class="string">git@github.com:leafyoung88/leafyoung88.github.io.git</span></span><br><span class="line">  <span class="attr">branch:</span> <span class="string">main</span></span><br></pre></td></tr></table></figure>
+
+<p>(注意，将其中leafyoung88改成你个人的用户名)</p>
+<p>以上指令指示需要将Hexo生成的静态网页发布到leafyoung88.github.io这个仓库的main分支，后续Hexo部署的时候，新的页面会替换原有的页面。</p>
+<h3 id="Step3：启用GitHub-Actions"><a href="#Step3：启用GitHub-Actions" class="headerlink" title="Step3：启用GitHub Actions"></a>Step3：启用GitHub Actions</h3><p>在.github目录下新建子目录workflows，并在其下新建文件“hexo-deploy.yml”，在文件中输入以下内容：</p>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">name:</span> <span class="string">Hexo</span> <span class="string">Deploy</span></span><br><span class="line"></span><br><span class="line"><span class="attr">on:</span></span><br><span class="line">  <span class="attr">push:</span></span><br><span class="line">    <span class="attr">branches:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="string">main</span></span><br><span class="line"></span><br><span class="line"><span class="attr">jobs:</span></span><br><span class="line">  <span class="attr">build:</span></span><br><span class="line">    <span class="attr">runs-on:</span> <span class="string">ubuntu-18.04</span></span><br><span class="line">    <span class="attr">if:</span> <span class="string">github.event.repository.owner.id</span> <span class="string">==</span> <span class="string">github.event.sender.id</span></span><br><span class="line"></span><br><span class="line">    <span class="attr">steps:</span></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Checkout</span> <span class="string">source</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/checkout@v2</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">ref:</span> <span class="string">main</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Node.js</span></span><br><span class="line">        <span class="attr">uses:</span> <span class="string">actions/setup-node@v1</span></span><br><span class="line">        <span class="attr">with:</span></span><br><span class="line">          <span class="attr">node-version:</span> <span class="string">&#x27;14&#x27;</span></span><br><span class="line"></span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Setup</span> <span class="string">Hexo</span></span><br><span class="line">        <span class="attr">env:</span></span><br><span class="line">          <span class="attr">ACTION_DEPLOY_KEY:</span> <span class="string">$&#123;&#123;</span> <span class="string">secrets.HEXO_DEPLOY_KEY</span> <span class="string">&#125;&#125;</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          mkdir -p ~/.ssh/</span></span><br><span class="line"><span class="string">          echo &quot;$ACTION_DEPLOY_KEY&quot; &gt; ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          cat ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          chmod 700 ~/.ssh</span></span><br><span class="line"><span class="string">          chmod 600 ~/.ssh/id_rsa</span></span><br><span class="line"><span class="string">          ssh-keyscan github.com &gt;&gt; ~/.ssh/known_hosts</span></span><br><span class="line"><span class="string">          git config --global user.email &quot;leafyoung88@hotmail.com&quot;</span></span><br><span class="line"><span class="string">          git config --global user.name &quot;yanglf&quot;</span></span><br><span class="line"><span class="string">          npm install hexo-cli -g</span></span><br><span class="line"><span class="string">          npm install hexo-deployer-git --save</span></span><br><span class="line"><span class="string">          npm install</span></span><br><span class="line"><span class="string"></span>          </span><br><span class="line">      <span class="bullet">-</span> <span class="attr">name:</span> <span class="string">Deploy</span></span><br><span class="line">        <span class="attr">run:</span> <span class="string">|</span></span><br><span class="line"><span class="string">          hexo clean</span></span><br><span class="line"><span class="string">          hexo deploy</span></span><br><span class="line"><span class="string"></span></span><br></pre></td></tr></table></figure>
+
+<p>这个workflow会在每次main分支有提交的时候自动执行，在github上自动根据hexo源代码生成静态网页，并自动部署到leafyoung88.github.io这个仓库中。</p>
+<h3 id="Step4：提交源码"><a href="#Step4：提交源码" class="headerlink" title="Step4：提交源码"></a>Step4：提交源码</h3><p>修改保存后，以下运行命令行，新建本地代码仓库，添加Hexo相关文件，然后提交到GitHub的仓库（blog）中：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">git init</span><br><span class="line">git add .</span><br><span class="line">git commit -m <span class="string">&quot;Initial commit&quot;</span></span><br><span class="line">git branch -M main</span><br><span class="line">git remote add origin https://github.com/leafyoung88/blog.git</span><br><span class="line">git push -u origin main</span><br></pre></td></tr></table></figure>
+
+<p>执行成功后，源码将上传到代码仓库的main分支<br><img src="github_blog_site_content.png" alt="github pages repo content"><br>提交完成后，Hexo Deploy这个workflow自动执行，几分钟后就可以在浏览器中访问<a href="https://leafyoung88.github.io/"><em>https://leafyoung88.github.io</em></a>了。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><ul>
+<li><a target="_blank" rel="noopener" href="https://phyzait.moe/deploy-hexo-with-action/"><em>https://phyzait.moe/deploy-hexo-with-action/</em></a></li>
+<li><a target="_blank" rel="noopener" href="https://zhuanlan.zhihu.com/p/35668237"><em>https://zhuanlan.zhihu.com/p/35668237</em></a></li>
+</ul>
+
+        </div>
+
+        
+            <div class="post-copyright-info">
+                <div class="article-copyright-info-container">
+    <ul>
+        <li>本文标题：GitHub Actions + Hexo 配置</li>
+        <li>本文作者：Lifu Yang</li>
+        <li>创建时间：2021-08-18 08:48:15</li>
+        <li>
+            本文链接：https://leafyoung88.github.io/2021/08/18/GitHub-Actions-Hexo/
+        </li>
+        <li>
+            版权声明：本博客所有文章除特别声明外，均采用 <a class="license" target="_blank" rel="noopener" href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh">BY-NC-SA</a> 许可协议。转载请注明出处！
+        </li>
+    </ul>
+</div>
+
+            </div>
+        
+
+        
+            <div class="article-nav">
+                
+                
+                    <div class="article-next">
+                        <a class="next"
+                           rel="next"
+                           href="/2020/04/17/Git-SSH%E9%85%8D%E7%BD%AE%E5%92%8C%E4%BD%BF%E7%94%A8/"
+                        >
+                            <span class="title flex-center">
+                                <span class="post-nav-title-item">Git SSH配置和使用</span>
+                                <span class="post-nav-item">下一篇</span>
+                            </span>
+                            <span class="right arrow-icon flex-center">
+                              <i class="fas fa-chevron-right"></i>
+                            </span>
+                        </a>
+                    </div>
+                
+            </div>
+        
+
+        
+    </div>
+</div>
+
+
+                
+            </div>
+
+        </div>
+
+        <div class="page-main-content-bottom">
+            <footer class="footer">
+    <div class="info-container">
+        <div class="copyright-info info-item">
+            &copy;
+            
+              <span>2020</span>&nbsp;-&nbsp;
+            
+            2021&nbsp;<i class="fas fa-heart icon-animate"></i>&nbsp;<a href="/">Lifu Yang</a>
+        </div>
+        
+            <script async  src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+            <div class="website-count info-item">
+                
+                    <span id="busuanzi_container_site_uv">
+                        访问人数&nbsp;<span id="busuanzi_value_site_uv"></span>&ensp;
+                    </span>
+                
+                
+                    <span id="busuanzi_container_site_pv">
+                        总访问量&nbsp;<span id="busuanzi_value_site_pv"></span>
+                    </span>
+                
+            </div>
+        
+        <div class="theme-info info-item">
+            由 <a target="_blank" href="https://hexo.io">Hexo</a> 驱动&nbsp;|&nbsp;主题&nbsp;<a class="theme-version" target="_blank" href="https://github.com/XPoet/hexo-theme-keep">Keep v3.4.3</a>
+        </div>
+        
+    </div>
+</footer>
+
+        </div>
+    </div>
+
+    
+        <div class="post-tools">
+            <div class="post-tools-container">
+    <ul class="tools-list">
+        <!-- TOC aside toggle -->
+        
+            <li class="tools-item page-aside-toggle">
+                <i class="fas fa-outdent"></i>
+            </li>
+        
+
+        <!-- go comment -->
+        
+    </ul>
+</div>
+
+        </div>
+    
+
+    <div class="right-bottom-side-tools">
+        <div class="side-tools-container">
+    <ul class="side-tools-list">
+        <li class="tools-item tool-font-adjust-plus flex-center">
+            <i class="fas fa-search-plus"></i>
+        </li>
+
+        <li class="tools-item tool-font-adjust-minus flex-center">
+            <i class="fas fa-search-minus"></i>
+        </li>
+
+        <li class="tools-item tool-expand-width flex-center">
+            <i class="fas fa-arrows-alt-h"></i>
+        </li>
+
+        <li class="tools-item tool-dark-light-toggle flex-center">
+            <i class="fas fa-moon"></i>
+        </li>
+
+        <!-- rss -->
+        
+
+        
+            <li class="tools-item tool-scroll-to-top flex-center">
+                <i class="fas fa-arrow-up"></i>
+            </li>
+        
+
+        <li class="tools-item tool-scroll-to-bottom flex-center">
+            <i class="fas fa-arrow-down"></i>
+        </li>
+    </ul>
+
+    <ul class="exposed-tools-list">
+        <li class="tools-item tool-toggle-show flex-center">
+            <i class="fas fa-cog fa-spin"></i>
+        </li>
+        
+    </ul>
+</div>
+
+    </div>
+
+    
+        <aside class="page-aside">
+            <div class="post-toc-wrap">
+    <div class="post-toc">
+        <ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E4%BB%8B%E7%BB%8D"><span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#GitHub%E7%AB%AF%E8%AE%BE%E7%BD%AE"><span class="nav-text">GitHub端设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Step1%EF%BC%9A%E7%94%9F%E6%88%90ssh%E5%AF%86%E9%92%A5"><span class="nav-text">Step1：生成ssh密钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step2%EF%BC%9A%E5%9C%A8GitHub%E6%B7%BB%E5%8A%A0%E5%85%AC%E9%92%A5"><span class="nav-text">Step2：在GitHub添加公钥</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step3%EF%BC%9A%E5%88%9B%E5%BB%BAGitHub-Pages%E4%BB%93%E5%BA%93"><span class="nav-text">Step3：创建GitHub Pages仓库</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step4%EF%BC%9A%E5%88%9B%E5%BB%BA%E7%AB%99%E7%82%B9%E6%BA%90%E7%A0%81%E4%BB%93%E5%BA%93"><span class="nav-text">Step4：创建站点源码仓库</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9C%AC%E5%9C%B0%E8%AE%BE%E7%BD%AE"><span class="nav-text">本地设置</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Step1%EF%BC%9A%E5%88%9B%E5%BB%BA%E6%9C%AC%E5%9C%B0%E7%AB%99%E7%82%B9"><span class="nav-text">Step1：创建本地站点</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step2%EF%BC%9A%E4%BF%AE%E6%94%B9%E9%83%A8%E7%BD%B2%E7%9B%AE%E6%A0%87"><span class="nav-text">Step2：修改部署目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step3%EF%BC%9A%E5%90%AF%E7%94%A8GitHub-Actions"><span class="nav-text">Step3：启用GitHub Actions</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Step4%EF%BC%9A%E6%8F%90%E4%BA%A4%E6%BA%90%E7%A0%81"><span class="nav-text">Step4：提交源码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8F%82%E8%80%83"><span class="nav-text">参考</span></a></li></ol>
+    </div>
+</div>
+        </aside>
+    
+
+    <div class="image-viewer-container">
+    <img src="">
+</div>
+
+
+    
+
+</main>
+
+
+
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/main.js"></script>
+
+<script src="/js/header-shrink.js"></script>
+
+<script src="/js/back2top.js"></script>
+
+<script src="/js/dark-light-toggle.js"></script>
+
+
+
+
+
+    
+<script src="/js/code-copy.js"></script>
+
+
+
+
+
+<div class="post-scripts">
+    
+        
+<script src="/js/left-side-toggle.js"></script>
+
+<script src="/js/libs/anime.min.js"></script>
+
+<script src="/js/toc.js"></script>
+
+    
+</div>
+
+
+
+</body>
+</html>
